@@ -5,10 +5,6 @@ package src
  */
 
 class Main {
-    var a = 1
-    var b = 3
-    var c = 12
-    var d = 11
 }
 
 fun main(args:Array<String>) {
