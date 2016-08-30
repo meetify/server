@@ -5,7 +5,8 @@ package src
  */
 
 class Main {
-
+    var a = 1
+    var b = 3
 }
 
 fun main(args:Array<String>) {
