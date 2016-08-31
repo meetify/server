@@ -14,20 +14,23 @@ class Server private constructor(
         var logger: Logger,
         var running: Boolean) : Runnable {
 
+    @Throws(BindException::class)
     constructor(port: Int) : this(
-            port,
+            { ->
+                if (port == 0) {
+                    ServerSocket(0).localPort
+                } else port
+            }(),
             { ->
                 try {
                     ServerSocket(port)
                 } catch(e: BindException) {
                     Logger.getAnonymousLogger().warning("port $port is already used")
-                    throw IllegalArgumentException("port $port is already used")
+                    throw e
                 }
             }(),
             Logger.getAnonymousLogger(),
-            false) {
-
-    }
+            false)
 
     override fun run() {
         synchronized(running) {
