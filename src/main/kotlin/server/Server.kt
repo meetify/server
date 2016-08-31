@@ -5,12 +5,12 @@ import java.net.ServerSocket
 import java.util.logging.Logger
 
 /**
- * Created by Dima on 31.08.2016.
+ * Created by kr3v on 31.08.2016.
  * Server main class. If
  */
 class Server private constructor(
         var port: Int,
-        var socket: ServerSocket,
+        var socketServer: ServerSocket,
         var logger: Logger,
         var running: Boolean) : Runnable {
 
@@ -18,7 +18,10 @@ class Server private constructor(
     constructor(port: Int) : this(
             { ->
                 if (port == 0) {
-                    ServerSocket(0).localPort
+                    val socketTemp = ServerSocket(0)
+                    socketTemp.use {
+                        socketTemp.localPort
+                    }
                 } else port
             }(),
             { ->
@@ -42,10 +45,10 @@ class Server private constructor(
             }
         }
 
-        if (socket.isClosed) {
-            logger.warning("socket is closed, trying to open again on $port, ${toString()}")
+        if (socketServer.isClosed) {
+            logger.warning("socketServer is closed, trying to open again on $port, ${toString()}")
             try {
-                socket = ServerSocket(port)
+                socketServer = ServerSocket(port)
             } catch(e: BindException) {
                 /**
                  * TODO: info about BindException in Server.run, if 'running' condition isn't enough
@@ -57,16 +60,14 @@ class Server private constructor(
         }
 
         do {
-            val socketAccept = socket.accept()
-            if (socketAccept != null) {
-                Thread(ClientProcessor(socketAccept)).start()
+            val socket = socketServer.accept()
+            if (socket != null) {
+                Thread(ClientProcessor(socket)).start()
             }
 
-        } while (socketAccept != null)
+        } while (socket != null && !socketServer.isClosed)
 
-        if (!socket.isClosed) {
-            socket.close()
-        }
+        socketServer.use { }
         running = false
     }
 

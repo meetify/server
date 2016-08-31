@@ -4,7 +4,7 @@ import server.Server
 import java.net.BindException
 
 /**
- * Created by Dima on 31.08.2016.
+ * Created by kr3v on 31.08.2016.
  * Tests for kotlin/server.Server
  */
 @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "UNUSED_VALUE")
@@ -19,8 +19,8 @@ class ServerTest : Assert() {
     @Test
     fun serverRunningTest() {
         val serverA = Server(0)
-        serverA.socket.close()
-        Server(serverA.socket.localPort)
+        serverA.socketServer.close()
+        Server(serverA.socketServer.localPort)
         serverA.run()
         assertEquals(false, serverA.running)
     }
