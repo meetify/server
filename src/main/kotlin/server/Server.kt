@@ -1,18 +1,23 @@
 package server
 
+import server.database.DBMain
 import java.net.BindException
 import java.net.ServerSocket
 import java.util.logging.Logger
 
 /**
  * Created by kr3v on 31.08.2016.
- * Server main class. If
+ * Server main class.
+ * TODO: make SSL implementation of ServerSocket
  */
 class Server private constructor(
         var port: Int,
         var socketServer: ServerSocket,
-        var logger: Logger,
         var running: Boolean) : Runnable {
+
+    companion object {
+        val logger: Logger = Logger.getAnonymousLogger()
+    }
 
     @Throws(BindException::class)
     constructor(port: Int) : this(
@@ -28,11 +33,10 @@ class Server private constructor(
                 try {
                     ServerSocket(port)
                 } catch(e: BindException) {
-                    Logger.getAnonymousLogger().warning("port $port is already used")
+                    logger.warning("port $port is already used")
                     throw e
                 }
             }(),
-            Logger.getAnonymousLogger(),
             false)
 
     override fun run() {
@@ -45,6 +49,9 @@ class Server private constructor(
             }
         }
 
+        if (!DBMain.isConnected) {
+            DBMain.connect()
+        }
         if (socketServer.isClosed) {
             logger.warning("socketServer is closed, trying to open again on $port, ${toString()}")
             try {
@@ -62,6 +69,7 @@ class Server private constructor(
         do {
             val socket = socketServer.accept()
             if (socket != null) {
+                logger.info("accepted $socket")
                 Thread(ClientProcessor(socket)).start()
             }
 
@@ -69,6 +77,7 @@ class Server private constructor(
 
         socketServer.use { }
         running = false
+        DBMain.disconnect()
     }
 
 }

@@ -1,7 +1,5 @@
-*.iml
 .idea
 .gradle
-out
-classes
-build
 gradle/
+out
+build
