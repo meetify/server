@@ -19,9 +19,7 @@ class ClientProcessor(var socket: Socket,
                       var input: DataInputStream = DataInputStream(socket.inputStream),
                       var output: DataOutputStream = DataOutputStream(socket.outputStream)) : Runnable {
 
-    private fun bin2hex(data: ByteArray): String {
-        return String.format("%0" + data.size * 2 + "X", BigInteger(1, data))
-    }
+    private fun bin2hex(data: ByteArray) = String.format("%0" + data.size * 2 + "X", BigInteger(1, data))
 
     private fun hash(string: String): String {
         val sha512 = MessageDigest.getInstance("SHA-512")
@@ -35,6 +33,7 @@ class ClientProcessor(var socket: Socket,
             when (input) {
                 "login" -> Server.logger.info(login().toString())
                 "register" -> Server.logger.info(register().toString())
+                "friends" -> Server.logger.info("");
             }
         }
     }
@@ -54,7 +53,6 @@ class ClientProcessor(var socket: Socket,
         val salt = hash(Random().nextLong().toString())
         output.writeUTF(salt)
         val input = input.readUTF().split("#")
-        Server.logger.warning(input.toString())
         val response = DBUsers.register(input[0], SCryptUtil.scrypt(input[1], 16384, 8, 1), salt)
         output.writeUTF(response.toString())
         return response
