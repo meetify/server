@@ -1,9 +1,9 @@
 package server.database
 
 import com.lambdaworks.crypto.SCryptUtil
-import server.Response
 import server.Server
-import server.database.data.User
+import serverModule.Response
+import serverModule.data.User
 import java.sql.ResultSet
 import java.util.*
 
@@ -87,9 +87,11 @@ object DBUsers {
     }
 
     fun updateDB(user: User) {
+        ///TODO: implement
     }
 
     fun updateDB(users: List<User>) {
+        ///TODO: implement
     }
 
 }

@@ -1,4 +1,4 @@
-package server
+package serverModule
 
 /**
  * Created by kr3v on 03.09.2016.
