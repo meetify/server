@@ -1,4 +1,6 @@
 import server.Server
+import server.database.DBMain
+import server.database.DBUsers
 
 /**
  * Created by kr3v on 30.08.2016.
@@ -6,7 +8,9 @@ import server.Server
  */
 
 fun main(args: Array<String>) {
-    Thread(Server(8080)).start()
-//    DBMain.connect()
-//    println(DBUsers.getSalt("user"))
+    DBMain.connect()
+    DBUsers.register("user", "pass", "salt")
+    DBUsers.register("user1", "pass1", "salt1")
+    DBUsers.register("user2", "pass2", "salt2")
+    println(DBUsers.createUsers())
 }

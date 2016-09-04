@@ -30,6 +30,7 @@ sourceSets {
 }
 
 dependencies {
+    compile 'org.postgresql:postgresql:9.4.1209'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.lambdaworks:scrypt:1.4.0'
     testCompile 'junit:junit:4.12'
