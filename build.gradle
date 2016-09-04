@@ -3,7 +3,6 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
-    kotlin_version = '1.0.3'
     repositories {
         mavenCentral()
     }
@@ -19,18 +18,15 @@ kotlin_version = '1.0.3'
 
 repositories {
     mavenCentral()
-}
-
-sourceSets {
-    test {
-        java {
-            srcDir "test/kotlin"
-        }
+    jcenter()
+    maven {
+        url "https://jitpack.io/"
     }
 }
 
 dependencies {
     compile 'org.postgresql:postgresql:9.4.1209'
+    compile 'com.github.meetify:serverModule:b1d68eae6a'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.lambdaworks:scrypt:1.4.0'
     testCompile 'junit:junit:4.12'
