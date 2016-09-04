@@ -1,4 +1,4 @@
-package server.database.data
+package serverModule.data
 
 /**
  * Created by kr3v on 04.09.2016.

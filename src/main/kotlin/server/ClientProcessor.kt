@@ -2,6 +2,7 @@ package server
 
 import com.lambdaworks.crypto.SCryptUtil
 import server.database.DBUsers
+import serverModule.Response
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.math.BigInteger
@@ -33,7 +34,7 @@ class ClientProcessor(var socket: Socket,
             when (input) {
                 "login" -> Server.logger.info(login().toString())
                 "register" -> Server.logger.info(register().toString())
-                "friends" -> Server.logger.info("");
+                "vklogin" -> Server.logger.info("")
             }
         }
     }
@@ -56,6 +57,17 @@ class ClientProcessor(var socket: Socket,
         val response = DBUsers.register(input[0], SCryptUtil.scrypt(input[1], 16384, 8, 1), salt)
         output.writeUTF(response.toString())
         return response
+    }
+
+    fun VKLogin(): Response {
+        val userVKID = input.readInt()
+        val userVKFriendList = input.readUTF().parseList()
+        return Response.ERROR
+    }
+
+    fun String.parseList(): List<Int> {
+        val list = ArrayList<Int>()
+        return list
     }
 
 }
