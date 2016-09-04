@@ -12,5 +12,5 @@ fun main(args: Array<String>) {
     DBUsers.register("user", "pass", "salt")
     DBUsers.register("user1", "pass1", "salt1")
     DBUsers.register("user2", "pass2", "salt2")
-    println(DBUsers.createUsers())
+    println(DBUsers.createUsers().toString() + "asdfajdslkfjasldflk")
 }
