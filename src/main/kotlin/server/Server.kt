@@ -1,8 +1,12 @@
 package server
 
 import server.database.DBMain
+import java.awt.List
 import java.net.BindException
 import java.net.ServerSocket
+import java.net.Socket
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Logger
 
 /**
@@ -10,74 +14,34 @@ import java.util.logging.Logger
  * Server main class.
  * TODO: make SSL implementation of ServerSocket
  */
-class Server private constructor(
-        var port: Int,
-        var socketServer: ServerSocket,
-        var running: Boolean) : Runnable {
+object Server : Runnable {
 
-    companion object {
-        val logger: Logger = Logger.getAnonymousLogger()
+    val socketList = Collections.newSetFromMap(ConcurrentHashMap<SimpleSocket, Boolean>())
+    val logger: Logger = Logger.getAnonymousLogger()
+    var port: Int = 8080
+    var socketServer: ServerSocket = ServerSocket(8080)
+
+    private fun  MutableSet<SimpleSocket>.add(element: Socket?) {
+        add(SimpleSocket(element!!))
     }
 
-    @Throws(BindException::class)
-    constructor(port: Int) : this(
-            { ->
-                if (port == 0) {
-                    val socketTemp = ServerSocket(0)
-                    socketTemp.use {
-                        socketTemp.localPort
-                    }
-                } else port
-            }(),
-            { ->
-                try {
-                    ServerSocket(port)
-                } catch(e: BindException) {
-                    logger.warning("port $port is already used")
-                    throw e
-                }
-            }(),
-            false)
-
     override fun run() {
-        synchronized(running) {
-            if (!running) {
-                running = true
-            } else {
-                logger.warning("this server running not in this Server.run, finishing, ${toString()}")
-                return
-            }
-        }
-
         if (!DBMain.isConnected) {
             DBMain.connect()
         }
-        if (socketServer.isClosed) {
-            logger.warning("socketServer is closed, trying to open again on $port, ${toString()}")
-            try {
-                socketServer = ServerSocket(port)
-            } catch(e: BindException) {
-                /**
-                 * TODO: info about BindException in Server.run, if 'running' condition isn't enough
-                 */
-                logger.warning("port $port is already used, finishing server, ${toString()}")
-                running = false
-                return
-            }
+
+        socketServer.use {
+            do {
+                val socket = socketServer.accept()
+                if (socket != null) {
+                    logger.info("accepted $socket")
+                    socketList.add(socket)
+                }
+
+            } while (true)
         }
-
-        do {
-            val socket = socketServer.accept()
-            if (socket != null) {
-                logger.info("accepted $socket")
-                Thread(ClientProcessor(socket)).start()
-            }
-
-        } while (socket != null && !socketServer.isClosed)
-
-        socketServer.use { }
-        running = false
         DBMain.disconnect()
+
     }
 
 }

@@ -16,9 +16,7 @@ import java.util.*
  * Client processor is class which used to response on client's requests.
  * TODO: implement login with AES (or similar) encryption
  */
-class ClientProcessor(var socket: Socket,
-                      var input: DataInputStream = DataInputStream(socket.inputStream),
-                      var output: DataOutputStream = DataOutputStream(socket.outputStream)) : Runnable {
+class ClientProcessor(var socket: SimpleSocket) {
 
     private fun bin2hex(data: ByteArray) = String.format("%0" + data.size * 2 + "X", BigInteger(1, data))
 
@@ -28,40 +26,40 @@ class ClientProcessor(var socket: Socket,
         return bin2hex(sha512.digest(string.toByteArray(Charset.forName("US-ASCII"))))
     }
 
-    override fun run() {
-        while (!socket.isClosed) {
-            val input = input.readUTF()
-            when (input) {
-                "login" -> Server.logger.info(login().toString())
-                "register" -> Server.logger.info(register().toString())
-                "vklogin" -> Server.logger.info("")
-            }
+    fun run() : Response {
+        Server.logger.warning("trying")
+        val input = socket.readUTF()
+        when (input) {
+            "login" -> return login()
+            "register" -> return register()
+            "vklogin" -> return loginVK()
         }
+        return Response.ERROR
     }
 
     fun login(): Response {
-        val username = input.readUTF()
+        val username = socket.readUTF()
         val salt = DBUsers.getSalt(username)
         if (salt == "")
             return Response.ERROR
-        output.writeUTF(salt)
-        val response = DBUsers.login(username, input.readUTF())
-        output.writeUTF(response.toString())
+        socket.writeUTF(salt)
+        val response = DBUsers.login(username, socket.readUTF())
+        socket.writeUTF(response.toString())
         return response
     }
 
     fun register(): Response {
         val salt = hash(Random().nextLong().toString())
-        output.writeUTF(salt)
-        val input = input.readUTF().split("#")
+        socket.writeUTF(salt)
+        val input = socket.readUTF().split("#")
         val response = DBUsers.register(input[0], SCryptUtil.scrypt(input[1], 16384, 8, 1), salt)
-        output.writeUTF(response.toString())
+        socket.writeUTF(response.toString())
         return response
     }
 
-    fun VKLogin(): Response {
-        val userVKID = input.readInt()
-        val userVKFriendList = input.readUTF().parseList()
+    fun loginVK(): Response {
+        val userVKID = socket.readInt()
+        val userVKFriendList = socket.readUTF().parseList()
         return Response.ERROR
     }
 
