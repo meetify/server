@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     compile 'org.postgresql:postgresql:9.4.1209'
-    compile 'com.github.meetify:serverModule:54a556525c'
+    compile 'com.github.meetify:serverModule:e47a817a09'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.lambdaworks:scrypt:1.4.0'
     testCompile 'junit:junit:4.12'
